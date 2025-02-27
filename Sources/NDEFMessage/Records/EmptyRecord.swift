@@ -1,15 +1,27 @@
 import Foundation
 
-public struct EmptyRecord: NDEF.Record {
-    public var header: NDEF.Header
+final class EmptyRecord: NDEF.Record {
+	required init(
+		header: NDEF.Header = .init(typeNameFormat: .empty, type: [], payload: [], id: nil),
+		type: [UInt8] = [],
+		id: [UInt8]? = nil,
+		payload: [UInt8] = []
+	) {
+		assert(type.count == 0, "Empty record should not have a type")
+		assert(id == nil, "Empty record should not have an ID")
+		assert(payload.count == 0, "Empty record should not have a payload")
 
-    public var type: [UInt8]
-
-    public var id: [UInt8]?
-
-    public var payload: [UInt8]
-
-	public var encode: Data {
-		.init()
+		super.init(
+			header:
+			.init(
+				typeNameFormat: .empty,
+				type: type,
+				payload: type,
+				id: id
+			),
+			type: type,
+			id: id,
+			payload: payload
+		)
 	}
 }

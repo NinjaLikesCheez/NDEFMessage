@@ -1,7 +1,25 @@
 extension NDEF {
-	public struct Message: Sendable {
+	struct Message: NDEFEncodable {
 		let records: [Record]
+
+		init(_ records: [Record]) {
+			if let first = records.first {
+				first.header.add(flag: .messageBegin)
+			}
+
+			if let last = records.last {
+				last.header.add(flag: .messageEnd)
+			}
+
+			self.records = records
+		}
+
+		var size: Int {
+			records.map(\.size).reduce(0, +)
+		}
+
+		var encoded: [UInt8] {
+			records.flatMap(\.encoded)
+		}
 	}
 }
-
-// TODO: test this \xd1\x01\x0fU\x04swiftisland.nl

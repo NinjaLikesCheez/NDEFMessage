@@ -1,9 +1,11 @@
-import Foundation
-
-public protocol NDEFEncodable: Sendable {
-	var encode: Data { get }
+protocol NDEFEncodable {
+	var encoded: [UInt8] { get }
+	var size: Int { get }
 }
 
-public struct NDEF: Sendable {
-	let messages: [Message]
+struct NDEF: NDEFEncodable {
+	let message: Message
+
+	var size: Int { message.size }
+	var encoded: [UInt8] { message.encoded }
 }
