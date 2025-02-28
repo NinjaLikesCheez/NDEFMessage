@@ -26,7 +26,6 @@ extension NDEF {
 
 extension NDEF.URIRecord {
 	enum URIProtocol: String, CaseIterable {
-		case none = ""
 		case httpWWW = "http://www."
 		case httpsWWW = "https://www."
 		case http = "http://"
@@ -62,6 +61,7 @@ extension NDEF.URIRecord {
 		case urnEpcRaw = "urn:epc:raw:"
 		case urnEpc = "urn:epc:"
 		case urnNfc = "urn:nfc:"
+		case none = ""
 
 		static func uriProtocol(for uri: String) -> URIProtocol {
 			for uriPrefix in URIProtocol.allCases where uri.starts(with: uriPrefix.rawValue) {

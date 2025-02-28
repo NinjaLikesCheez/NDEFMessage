@@ -72,6 +72,25 @@ extension NDEF {
 			if payload.count < 255 {
 				flags.insert(.shortRecord)
 			}
+
+			// Verify specification requirements
+			assert(0x00...0x06 ~= typeNameFormat.rawValue, "TNF must be between 0x00 & 0x06")
+
+			switch typeNameFormat.rawValue {
+			case 0x00:
+				assert(
+					typeLength == 0 && idLength == 0 && payloadLength == 0,
+					"A TNF of 0x00 (Empty) requires that type, id, and payload length are all zero"
+				)
+			case 0x05:
+				assert(typeLength == 0, "A TNF of 0x05 (Unknown) requires that type length is 0")
+			case 0x06:
+				assert(typeLength == 0, "A TNF of 0x06 (Unchanged) requires that type length is 0")
+			case 0x07:
+				assert(true, "A TNF of 0x07 (Reserved) is not allowed")
+			default:
+				break
+			}
 		}
 
 		mutating func add(flag: Flag) {
