@@ -20,9 +20,15 @@ extension NDEF {
 			self.payload = payload
 		}
 
+		var count: Int {
+			header.count + type.count + (id?.count ?? 0) + payload.count
+		}
+
 		var size: Int {
-			// TODO: these sizes are wrong - we want the memory layout representation not the amount of items in the array... duh...
-			header.size + type.count + (id?.count ?? 0) + payload.count
+			header.size +
+				(MemoryLayout<UInt8>.size * type.count) +
+				(MemoryLayout<UInt8>.size * (id?.count ?? 0)) +
+				(MemoryLayout<UInt8>.size * payload.count)
 		}
 
 		var encoded: [UInt8] {
@@ -63,7 +69,7 @@ extension NDEF {
 				self.idLength = nil
 			}
 
-			if payload.count > 255 {
+			if payload.count < 255 {
 				flags.insert(.shortRecord)
 			}
 		}
@@ -107,6 +113,23 @@ extension NDEF {
 		}
 
 		var size: Int {
+			// one byte holds the flags & TNF
+			var size: Int = 1
+			size += MemoryLayout.size(ofValue: typeLength)
+			if flags.contains(.shortRecord) {
+				size += MemoryLayout<UInt8>.size
+			} else {
+				size += MemoryLayout<UInt32>.size
+			}
+
+			if let idLength {
+				size += MemoryLayout.size(ofValue: idLength)
+			}
+
+			return size
+		}
+
+		var count: Int {
 			// one byte holds the flags & TNF
 			1 + Int(typeLength) + Int(payloadLength) + Int(idLength ?? 0)
 		}
